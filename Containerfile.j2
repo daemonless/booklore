@@ -7,6 +7,7 @@ FROM ghcr.io/daemonless/nginx-base:${BASE_VERSION}
 
 ARG FREEBSD_ARCH=amd64
 ARG BOOKLORE_VERSION
+ARG PACKAGES="openjdk21-jre"
 ARG UPSTREAM_URL="https://api.github.com/repos/booklore-app/booklore/releases/latest"
 ARG UPSTREAM_JQ=".tag_name"
 ARG HEALTHCHECK_ENDPOINT="http://localhost:6060/api/health"
@@ -36,7 +37,7 @@ LABEL org.opencontainers.image.title="{{ title }}" \
 
 # Install Java runtime
 RUN pkg update && \
-    pkg install -y openjdk21-jre && \
+    pkg install -y ${PACKAGES} && \
     pkg clean -ay && \
     rm -rf /var/cache/pkg/* /var/db/pkg/repos/*
 

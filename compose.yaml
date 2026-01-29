@@ -11,6 +11,26 @@ x-daemonless:
   mlock: false
   upstream_binary: true
   notes: |
+    ## Networking
+
+    This compose uses `network_mode: host` so services communicate via `127.0.0.1`.
+
+    For isolated networking (multiple stacks, no port conflicts), use bridge mode with the [dnsname CNI plugin](https://github.com/containers/dnsname):
+
+    ```yaml
+    services:
+      booklore:
+        # remove network_mode: host, add ports
+        ports:
+          - "6060:6060"
+        environment:
+          SPRING_DATASOURCE_URL: "jdbc:mariadb://mariadb:3306/booklore"
+
+      mariadb:
+        # remove network_mode: host
+        # container name becomes DNS hostname
+    ```
+
     ## Migration from Official Image
 
     This image uses `/app/data` for application data, matching the official `ghcr.io/booklore-app/booklore` image. You can migrate from Linux to FreeBSD:
@@ -38,19 +58,18 @@ services:
   booklore:
     image: ghcr.io/daemonless/booklore:latest
     container_name: booklore
+    network_mode: host
     environment:
       - PUID=1000
       - PGID=1000
       - TZ=Etc/UTC
-      - SPRING_DATASOURCE_URL=jdbc:mariadb://mariadb:3306/booklore
+      - SPRING_DATASOURCE_URL=jdbc:mariadb://127.0.0.1:3306/booklore
       - SPRING_DATASOURCE_USERNAME=booklore
       - SPRING_DATASOURCE_PASSWORD=changeme
     volumes:
       - booklore-data:/app/data
       - booklore-books:/books
       - booklore-bookdrop:/bookdrop
-    ports:
-      - "6060:6060"
     depends_on:
       - mariadb
     restart: unless-stopped
@@ -58,6 +77,7 @@ services:
   mariadb:
     image: ghcr.io/daemonless/mariadb:latest
     container_name: booklore-mariadb
+    network_mode: host
     environment:
       - PUID=1000
       - PGID=1000

@@ -106,6 +106,16 @@ Access at: `http://localhost:6060`
 |------|----------|-------------|
 | `6060` | TCP | Web interface |
 
+## Networking
+
+The compose example uses `mariadb` as the database hostname. This requires `cni-dnsname` for container DNS resolution. If not available, use `network_mode: host` with `127.0.0.1` instead:
+
+```yaml
+network_mode: host
+environment:
+  SPRING_DATASOURCE_URL: "jdbc:mariadb://127.0.0.1:3306/booklore"
+```
+
 ## Migration from Official Image
 
 This image uses `/app/data` for application data, matching the official `ghcr.io/booklore-app/booklore` image. You can migrate from Linux to FreeBSD:
