@@ -2,6 +2,6 @@ icon: ':material-book-open-page-variant:'
 
 cit:
   compose: true
-  mode: port
+  mode: screenshot
   port: 6060
   wait: 120
