@@ -4,5 +4,4 @@ cit:
   compose: true
   mode: screenshot
   port: 6060
-  health: /api/health
   wait: 120
