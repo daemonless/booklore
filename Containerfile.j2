@@ -54,8 +54,8 @@ COPY root/ /
 # Make scripts executable
 RUN chmod +x /etc/services.d/*/run /etc/cont-init.d/* /healthz 2>/dev/null || true
 
-# Extract version from upstream
-RUN echo "${BOOKLORE_VERSION}" > /app/version
+# Copy version from upstream
+COPY --from=upstream /app/version /app/version
 
 ENV BOOKLORE_PORT=6060 \
     SPRING_DATASOURCE_URL="" \
