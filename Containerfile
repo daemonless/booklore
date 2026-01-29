@@ -13,6 +13,7 @@ FROM ghcr.io/daemonless/nginx-base:${BASE_VERSION}
 
 ARG FREEBSD_ARCH=amd64
 ARG BOOKLORE_VERSION
+ARG PACKAGES="openjdk21-jre"
 ARG UPSTREAM_URL="https://api.github.com/repos/booklore-app/booklore/releases/latest"
 ARG UPSTREAM_JQ=".tag_name"
 ARG HEALTHCHECK_ENDPOINT="http://localhost:6060/api/health"
@@ -29,7 +30,6 @@ LABEL org.opencontainers.image.title="BookLore" \
       org.opencontainers.image.vendor="daemonless" \
       org.opencontainers.image.authors="daemonless" \
       io.daemonless.category="Media Management" \
-      io.daemonless.port="6060" \
       io.daemonless.volumes="/app/data,/books,/bookdrop" \
       io.daemonless.arch="${FREEBSD_ARCH}" \
       io.daemonless.upstream-url="${UPSTREAM_URL}" \
@@ -38,7 +38,7 @@ LABEL org.opencontainers.image.title="BookLore" \
 
 # Install Java runtime
 RUN pkg update && \
-    pkg install -y openjdk21-jre && \
+    pkg install -y ${PACKAGES} && \
     pkg clean -ay && \
     rm -rf /var/cache/pkg/* /var/db/pkg/repos/*
 
@@ -67,7 +67,6 @@ ENV BOOKLORE_PORT=6060 \
     JAVA_OPTS=""
 
 # --- Expose (Injected by Generator) ---
-EXPOSE 6060
 
 # --- Volumes (Injected by Generator) ---
 VOLUME /app/data /books /bookdrop

@@ -9,7 +9,6 @@ Self-hosted digital library with smart shelves, metadata, OPDS support, and buil
 
 | | |
 |---|---|
-| **Port** | 6060 |
 | **Registry** | `ghcr.io/daemonless/booklore` |
 | **Docs** | [daemonless.io/images/booklore](https://daemonless.io/images/booklore/) |
 | **Source** | [https://github.com/booklore-app/booklore](https://github.com/booklore-app/booklore) |
@@ -28,15 +27,13 @@ services:
       - PUID=1000
       - PGID=1000
       - TZ=Etc/UTC
-      - SPRING_DATASOURCE_URL=jdbc:mariadb://mariadb:3306/booklore
+      - SPRING_DATASOURCE_URL=jdbc:mariadb://127.0.0.1:3306/booklore
       - SPRING_DATASOURCE_USERNAME=booklore
       - SPRING_DATASOURCE_PASSWORD=changeme
     volumes:
       - /path/to/containers/booklore/app/data:/app/data
       - /path/to/books:/books
       - /path/to/containers/booklore/bookdrop:/bookdrop
-    ports:
-      - 6060:6060
     restart: unless-stopped
 ```
 
@@ -44,11 +41,10 @@ services:
 
 ```bash
 podman run -d --name booklore \
-  -p 6060:6060 \
   -e PUID=@PUID@ \
   -e PGID=@PGID@ \
   -e TZ=@TZ@ \
-  -e SPRING_DATASOURCE_URL=jdbc:mariadb://mariadb:3306/booklore \
+  -e SPRING_DATASOURCE_URL=jdbc:mariadb://127.0.0.1:3306/booklore \
   -e SPRING_DATASOURCE_USERNAME=booklore \
   -e SPRING_DATASOURCE_PASSWORD=changeme \
   -v /path/to/containers/booklore/app/data:/app/data \ 
@@ -56,7 +52,6 @@ podman run -d --name booklore \
   -v /path/to/containers/booklore/bookdrop:/bookdrop \ 
   ghcr.io/daemonless/booklore:latest
 ```
-Access at: `http://localhost:6060`
 
 ### Ansible
 
@@ -71,11 +66,9 @@ Access at: `http://localhost:6060`
       PUID: "@PUID@"
       PGID: "@PGID@"
       TZ: "@TZ@"
-      SPRING_DATASOURCE_URL: "jdbc:mariadb://mariadb:3306/booklore"
+      SPRING_DATASOURCE_URL: "jdbc:mariadb://127.0.0.1:3306/booklore"
       SPRING_DATASOURCE_USERNAME: "booklore"
       SPRING_DATASOURCE_PASSWORD: "changeme"
-    ports:
-      - "6060:6060"
     volumes:
       - "/path/to/containers/booklore/app/data:/app/data"
       - "/path/to/books:/books"
@@ -90,7 +83,7 @@ Access at: `http://localhost:6060`
 | `PUID` | `1000` |  |
 | `PGID` | `1000` |  |
 | `TZ` | `Etc/UTC` |  |
-| `SPRING_DATASOURCE_URL` | `jdbc:mariadb://mariadb:3306/booklore` | MariaDB JDBC URL (e.g., jdbc:mariadb://mariadb:3306/booklore) |
+| `SPRING_DATASOURCE_URL` | `jdbc:mariadb://127.0.0.1:3306/booklore` | MariaDB JDBC URL (e.g., jdbc:mariadb://mariadb:3306/booklore) |
 | `SPRING_DATASOURCE_USERNAME` | `booklore` | Database username |
 | `SPRING_DATASOURCE_PASSWORD` | `changeme` | Database password |
 ### Volumes
@@ -100,20 +93,25 @@ Access at: `http://localhost:6060`
 | `/app/data` | Configuration and application data |
 | `/books` | Book library directory |
 | `/bookdrop` | Drop folder for automatic imports |
-### Ports
-
-| Port | Protocol | Description |
-|------|----------|-------------|
-| `6060` | TCP | Web interface |
 
 ## Networking
 
-The compose example uses `mariadb` as the database hostname. This requires `cni-dnsname` for container DNS resolution. If not available, use `network_mode: host` with `127.0.0.1` instead:
+This compose uses `network_mode: host` so services communicate via `127.0.0.1`.
+
+For isolated networking (multiple stacks, no port conflicts), use bridge mode with the [dnsname CNI plugin](https://github.com/containers/dnsname):
 
 ```yaml
-network_mode: host
-environment:
-  SPRING_DATASOURCE_URL: "jdbc:mariadb://127.0.0.1:3306/booklore"
+services:
+  booklore:
+    # remove network_mode: host, add ports
+    ports:
+      - "6060:6060"
+    environment:
+      SPRING_DATASOURCE_URL: "jdbc:mariadb://mariadb:3306/booklore"
+
+  mariadb:
+    # remove network_mode: host
+    # container name becomes DNS hostname
 ```
 
 ## Migration from Official Image
