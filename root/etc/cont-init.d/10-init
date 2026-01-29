@@ -1,0 +1,19 @@
+#!/bin/sh
+# BookLore initialization
+
+echo "==> Initializing BookLore..."
+
+# Create directories
+mkdir -p /config/nginx /config/log/nginx /config/data /books /bookdrop
+
+# Copy default nginx config if not exists
+if [ ! -f /config/nginx/nginx.conf ]; then
+    echo "==> Installing default nginx config..."
+    cp /defaults/nginx.conf /config/nginx/
+    cp /defaults/site.conf /config/nginx/
+fi
+
+# Set permissions
+chown -R bsd:bsd /config /books /bookdrop /app /var/www/html
+
+echo "==> BookLore initialized"

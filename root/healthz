@@ -1,0 +1,21 @@
+#!/bin/sh
+# Health check for BookLore
+# Checks both nginx and Spring Boot backend
+
+# Check nginx
+if ! pgrep -x nginx > /dev/null; then
+    echo "nginx not running"
+    exit 1
+fi
+
+# Check Java backend via API
+if ! fetch -qo /dev/null --timeout 5 "http://127.0.0.1:8080/api/health" 2>/dev/null; then
+    # Try the actuator endpoint
+    if ! fetch -qo /dev/null --timeout 5 "http://127.0.0.1:8080/actuator/health" 2>/dev/null; then
+        echo "BookLore backend not responding"
+        exit 1
+    fi
+fi
+
+echo "healthy"
+exit 0

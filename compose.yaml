@@ -1,0 +1,77 @@
+name: booklore
+
+x-daemonless:
+  title: "BookLore"
+  icon: ":material-book-open-page-variant:"
+  category: "Media Management"
+  description: "Self-hosted digital library with smart shelves, metadata, OPDS support, and built-in reader."
+  upstream_url: "https://github.com/booklore-app/booklore"
+  web_url: "https://booklore.org/"
+  user: "bsd"
+  mlock: false
+  upstream_binary: true
+  notes: |
+    ## Migration from Official Image
+
+    This image uses `/app/data` for application data, matching the official `ghcr.io/booklore-app/booklore` image. You can migrate from Linux to FreeBSD:
+
+    1. Stop containers on source host
+    2. Copy `/containers/booklore/` (data + mariadb) to destination
+    3. Start containers on destination
+
+    The MariaDB data format is compatible between Linux and FreeBSD.
+
+  docs:
+    env:
+      SPRING_DATASOURCE_URL: "MariaDB JDBC URL (e.g., jdbc:mariadb://mariadb:3306/booklore)"
+      SPRING_DATASOURCE_USERNAME: "Database username"
+      SPRING_DATASOURCE_PASSWORD: "Database password"
+      JAVA_OPTS: "Additional JVM options"
+    volumes:
+      /app/data: "Configuration and application data"
+      /books: "Book library directory"
+      /bookdrop: "Drop folder for automatic imports"
+    ports:
+      6060: "Web interface"
+
+services:
+  booklore:
+    image: ghcr.io/daemonless/booklore:latest
+    container_name: booklore
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+      - SPRING_DATASOURCE_URL=jdbc:mariadb://mariadb:3306/booklore
+      - SPRING_DATASOURCE_USERNAME=booklore
+      - SPRING_DATASOURCE_PASSWORD=changeme
+    volumes:
+      - booklore-data:/app/data
+      - booklore-books:/books
+      - booklore-bookdrop:/bookdrop
+    ports:
+      - "6060:6060"
+    depends_on:
+      - mariadb
+    restart: unless-stopped
+
+  mariadb:
+    image: ghcr.io/daemonless/mariadb:latest
+    container_name: booklore-mariadb
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+      - MYSQL_ROOT_PASSWORD=changeme
+      - MYSQL_DATABASE=booklore
+      - MYSQL_USER=booklore
+      - MYSQL_PASSWORD=changeme
+    volumes:
+      - booklore-mariadb:/config
+    restart: unless-stopped
+
+volumes:
+  booklore-data:
+  booklore-books:
+  booklore-bookdrop:
+  booklore-mariadb:
