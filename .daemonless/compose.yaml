@@ -11,7 +11,7 @@ services:
       SPRING_DATASOURCE_PASSWORD: "testpass"
       JAVA_OPTS: "-Xmx512m"
     volumes:
-      - booklore-config:/config
+      - booklore-data:/app/data
       - booklore-books:/books
     depends_on:
       mariadb:
@@ -34,6 +34,6 @@ services:
       retries: 20
 
 volumes:
-  booklore-config:
+  booklore-data:
   booklore-books:
   mariadb-data:
