@@ -56,9 +56,9 @@ COPY root/ /
 # Make scripts executable
 RUN chmod +x /etc/services.d/*/run /etc/cont-init.d/* /healthz 2>/dev/null || true
 
-# Write version (passed from build script via --build-arg)
-ARG APP_VERSION=latest
-RUN echo "${APP_VERSION}" > /app/version
+# Write version from upstream
+RUN VERSION=$(fetch -qo - "${UPSTREAM_URL}" | sed -n 's/.*"tag_name"[^"]*"\([^"]*\)".*/\1/p' | tr -d 'v') && \
+    echo "$VERSION" > /app/version
 
 ENV BOOKLORE_PORT=6060 \
     SPRING_DATASOURCE_URL="" \
