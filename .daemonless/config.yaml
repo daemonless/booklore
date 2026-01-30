@@ -5,3 +5,5 @@ cit:
   mode: screenshot
   port: 6060
   wait: 120
+  health: /actuator/health
+  screenshot_wait: 30
