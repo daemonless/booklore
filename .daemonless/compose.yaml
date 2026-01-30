@@ -15,7 +15,7 @@ services:
       - booklore-books:/books
     depends_on:
       mariadb:
-        condition: service_started
+        condition: service_healthy
 
   mariadb:
     image: ghcr.io/daemonless/mariadb:11.4
@@ -27,6 +27,12 @@ services:
       MYSQL_PASSWORD: "testpass"
     volumes:
       - mariadb-data:/config
+    healthcheck:
+      test: ["CMD", "mariadb", "-u", "booklore", "-ptestpass", "-e", "SELECT 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 10s
 
 volumes:
   booklore-data:
