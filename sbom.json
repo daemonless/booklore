@@ -1,11 +1,11 @@
 {
   "image": "booklore",
-  "generated": "2026-02-01T22:28:25Z",
+  "generated": "2026-02-02T13:33:21Z",
   "tags": {
     "latest": {
       "app_version": "1.18.5",
       "source": "upstream-binary",
-      "generated": "2026-02-01T22:22:06Z",
+      "generated": "2026-02-02T13:27:31Z",
       "packages": {
         "freebsd": [
           {
