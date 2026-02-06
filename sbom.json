@@ -1,11 +1,12 @@
 {
   "image": "booklore",
-  "generated": "2026-02-02T13:33:21Z",
+  "generated": "2026-02-06T00:02:01Z",
   "tags": {
     "latest": {
+      "arch": "amd64",
       "app_version": "1.18.5",
       "source": "upstream-binary",
-      "generated": "2026-02-02T13:27:31Z",
+      "generated": "2026-02-05T23:53:34Z",
       "packages": {
         "freebsd": [
           {
@@ -358,17 +359,26 @@
           }
         ],
         "dotnet": [],
-        "python": [],
+        "python": [
+          {
+            "name": "example",
+            "version": "21.12"
+          },
+          {
+            "name": "packaging",
+            "version": "25.0"
+          }
+        ],
         "node": [],
         "go": []
       },
       "summary": {
         "freebsd": 87,
         "dotnet": 0,
-        "python": 0,
+        "python": 2,
         "node": 0,
         "go": 0,
-        "total": 87
+        "total": 89
       }
     }
   }
