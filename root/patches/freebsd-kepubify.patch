@@ -1,0 +1,11 @@
+--- a/KepubConversionService.java
++++ b/KepubConversionService.java
+@@ -84,7 +84,7 @@
+             } else {
+                 return BIN_DARWIN_X64;
+             }
+-        } else if (osName.contains("linux")) {
++        } else if (osName.contains("linux") || osName.contains("freebsd")) {
+             if (osArch.contains("arm64") || osArch.contains("aarch64")) {
+                 return BIN_LINUX_ARM64;
+             } else if (osArch.contains("arm")) {

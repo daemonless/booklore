@@ -13,7 +13,7 @@ FROM ghcr.io/daemonless/nginx-base:${BASE_VERSION}
 
 ARG FREEBSD_ARCH=amd64
 ARG BOOKLORE_VERSION
-ARG PACKAGES="openjdk21-jre"
+ARG PACKAGES="openjdk21-jre kepubify"
 ARG UPSTREAM_URL="https://api.github.com/repos/booklore-app/booklore/releases/latest"
 ARG UPSTREAM_JQ=".tag_name"
 ARG HEALTHCHECK_ENDPOINT="http://localhost:6060/api/health"
@@ -46,19 +46,37 @@ RUN pkg update && \
 COPY --from=upstream /app/app.jar /app/app.jar
 COPY --from=upstream /usr/share/nginx/html /var/www/html
 
-# Create directories (use /app/data to match upstream for migration compatibility)
-RUN mkdir -p /app/data /books /bookdrop /app/logs && \
-    chown -R bsd:bsd /app/data /books /bookdrop /app /var/www/html
-
-# Copy service definitions and configs
-COPY root/ /
-
-# Make scripts executable
-RUN chmod +x /etc/services.d/*/run /etc/cont-init.d/* /healthz 2>/dev/null || true
-
 # Write version from upstream
 RUN VERSION=$(fetch -qo - "${UPSTREAM_URL}" | sed -n 's/.*"tag_name"[^"]*"\([^"]*\)".*/\1/p' | tr -d 'v') && \
     echo "$VERSION" > /app/version
+
+# Copy service definitions and configs (includes patches/)
+COPY root/ /
+
+# Patch KepubConversionService to support FreeBSD
+# Fetch source matching current version, apply patch, compile, update jar
+RUN pkg install -y openjdk21 && \
+    cd /tmp && mkdir build && cd build && \
+    jar -xf /app/app.jar BOOT-INF/ && \
+    KEPUB_PKG="com/adityachandel/booklore/service/kobo" && \
+    fetch -qo KepubConversionService.java \
+        "https://raw.githubusercontent.com/booklore-app/booklore/v$(cat /app/version)/booklore-api/src/main/java/${KEPUB_PKG}/KepubConversionService.java" && \
+    patch -p1 KepubConversionService.java /patches/freebsd-kepubify.patch && \
+    sed -i '' -e '/import lombok/d' -e 's/@Slf4j/@SuppressWarnings("unused")/' KepubConversionService.java && \
+    sed -i '' 's/public class KepubConversionService {/public class KepubConversionService { private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(KepubConversionService.class);/' KepubConversionService.java && \
+    CP="BOOT-INF/classes:$(find BOOT-INF/lib -name '*.jar' | tr '\n' ':')" && \
+    javac -proc:none -cp "$CP" -d BOOT-INF/classes KepubConversionService.java && \
+    jar -uf /app/app.jar -C /tmp/build \
+        BOOT-INF/classes/${KEPUB_PKG}/KepubConversionService.class && \
+    pkg delete -y openjdk21 && pkg autoremove -y && pkg clean -ay && \
+    rm -rf /tmp/build /var/cache/pkg/* /var/db/pkg/repos/*
+
+# Create directories
+RUN mkdir -p /app/data /books /bookdrop /app/logs && \
+    chown -R bsd:bsd /app/data /books /bookdrop /app /var/www/html
+
+# Make scripts executable
+RUN chmod +x /etc/services.d/*/run /etc/cont-init.d/* /healthz 2>/dev/null || true
 
 ENV BOOKLORE_PORT=6060 \
     SPRING_DATASOURCE_URL="" \

@@ -13,6 +13,10 @@ if [ ! -f /config/nginx/nginx.conf ]; then
     cp /defaults/site.conf /config/nginx/
 fi
 
+# Symlink native kepubify for FreeBSD (booklore only ships Linux/Mac binaries)
+mkdir -p /app/data/tools/kepubify
+ln -sf /usr/local/bin/kepubify /app/data/tools/kepubify/kepubify-linux-64bit
+
 # Set permissions
 chown -R bsd:bsd /config /books /bookdrop /app /var/www/html
 
