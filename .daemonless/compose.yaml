@@ -4,6 +4,7 @@ name: booklore-test
 services:
   booklore:
     image: ghcr.io/daemonless/booklore:build
+    pull_policy: never
     network_mode: host
     environment:
       SPRING_DATASOURCE_URL: "jdbc:mariadb://127.0.0.1:3306/booklore"
