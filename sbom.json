@@ -1,12 +1,12 @@
 {
   "image": "booklore",
-  "generated": "2026-02-15T10:33:57Z",
+  "generated": "2026-02-22T00:54:38Z",
   "tags": {
     "latest": {
       "arch": "amd64",
       "app_version": "1.18.5",
       "source": "upstream",
-      "generated": "2026-02-15T10:33:40Z",
+      "generated": "2026-02-22T00:54:20Z",
       "packages": {
         "freebsd": [
           {
@@ -210,6 +210,10 @@
             "version": "1.8.1"
           },
           {
+            "name": "kepubify",
+            "version": "4.0.4_35"
+          },
+          {
             "name": "lcms2",
             "version": "2.17"
           },
@@ -359,7 +363,52 @@
           }
         ],
         "dotnet": [],
-        "go": [],
+        "go": [
+          {
+            "name": "github.com/pgaskin/kepubify/v4",
+            "version": ""
+          },
+          {
+            "name": "stdlib",
+            "version": "v1.24.13"
+          },
+          {
+            "name": "github.com/bamiaux/rez",
+            "version": "v0.0.0-20170731184118-29f4463c688b"
+          },
+          {
+            "name": "github.com/beevik/etree",
+            "version": "v1.1.0"
+          },
+          {
+            "name": "github.com/pgaskin/koboutils/v2",
+            "version": "v2.1.2-0.20220306004009-a07e72ebae42"
+          },
+          {
+            "name": "github.com/spf13/pflag",
+            "version": "v1.0.5"
+          },
+          {
+            "name": "github.com/kr/smartypants",
+            "version": "v0.1.0"
+          },
+          {
+            "name": "github.com/pgaskin/kepubify/_/html",
+            "version": "v0.0.0-20211223234002-6ee2cc632cdc"
+          },
+          {
+            "name": "golang.org/x/sync",
+            "version": "v0.0.0-20210220032951-036812b2e83c"
+          },
+          {
+            "name": "golang.org/x/text",
+            "version": "v0.3.6"
+          },
+          {
+            "name": "github.com/mattn/go-sqlite3",
+            "version": "v1.14.12"
+          }
+        ],
         "java": [
           {
             "name": "ch.qos.logback:logback-classic",
@@ -954,16 +1003,16 @@
         "rust": []
       },
       "summary": {
-        "freebsd": 87,
+        "freebsd": 88,
         "dotnet": 0,
-        "go": 0,
+        "go": 11,
         "java": 144,
         "node": 0,
         "php": 0,
         "python": 2,
         "ruby": 0,
         "rust": 0,
-        "total": 233
+        "total": 245
       }
     }
   }
