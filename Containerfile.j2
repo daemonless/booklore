@@ -3,14 +3,14 @@ ARG BASE_VERSION=15
 
 FROM --platform=linux/amd64 ghcr.io/booklore-app/booklore:${BOOKLORE_VERSION} AS upstream
 
-FROM ghcr.io/daemonless/nginx-base:${BASE_VERSION}
+FROM ghcr.io/daemonless/base:${BASE_VERSION}
 
 ARG FREEBSD_ARCH=amd64
 ARG BOOKLORE_VERSION
-ARG PACKAGES="openjdk21-jre kepubify"
+ARG PACKAGES="openjdk-jre kepubify"
 ARG UPSTREAM_URL="https://api.github.com/repos/booklore-app/booklore/releases/latest"
 ARG UPSTREAM_JQ=".tag_name"
-ARG HEALTHCHECK_ENDPOINT="http://localhost:6060/api/health"
+ARG HEALTHCHECK_ENDPOINT="http://localhost:6060/api/v1/healthcheck"
 
 ENV HEALTHCHECK_URL="${HEALTHCHECK_ENDPOINT}"
 
@@ -43,7 +43,6 @@ RUN pkg update && \
 
 # Copy application from upstream
 COPY --from=upstream /app/app.jar /app/app.jar
-COPY --from=upstream /usr/share/nginx/html /var/www/html
 
 # Write version from upstream
 RUN VERSION=$(fetch -qo - "${UPSTREAM_URL}" | sed -n 's/.*"tag_name"[^"]*"\([^"]*\)".*/\1/p' | tr -d 'v') && \
@@ -52,12 +51,15 @@ RUN VERSION=$(fetch -qo - "${UPSTREAM_URL}" | sed -n 's/.*"tag_name"[^"]*"\([^"]
 # Copy service definitions and configs (includes patches/)
 COPY root/ /
 
+# Remove nginx service (it was for old versions)
+RUN rm -rf /etc/services.d/nginx /defaults
+
 # Patch KepubConversionService to support FreeBSD
 # Fetch source matching current version, apply patch, compile, update jar
-RUN pkg install -y openjdk21 && \
+RUN pkg install -y openjdk25 && \
     cd /tmp && mkdir build && cd build && \
     jar -xf /app/app.jar BOOT-INF/ && \
-    KEPUB_PKG="com/adityachandel/booklore/service/kobo" && \
+    KEPUB_PKG="org/booklore/service/kobo" && \
     fetch -qo KepubConversionService.java \
         "https://raw.githubusercontent.com/booklore-app/booklore/v$(cat /app/version)/booklore-api/src/main/java/${KEPUB_PKG}/KepubConversionService.java" && \
     patch -p1 KepubConversionService.java /patches/freebsd-kepubify.patch && \
@@ -67,12 +69,12 @@ RUN pkg install -y openjdk21 && \
     javac -proc:none -cp "$CP" -d BOOT-INF/classes KepubConversionService.java && \
     jar -uf /app/app.jar -C /tmp/build \
         BOOT-INF/classes/${KEPUB_PKG}/KepubConversionService.class && \
-    pkg delete -y openjdk21 && pkg autoremove -y && pkg clean -ay && \
+    pkg delete -y openjdk25 && pkg autoremove -y && pkg clean -ay && \
     rm -rf /tmp/build /var/cache/pkg/* /var/db/pkg/repos/*
 
 # Create directories
 RUN mkdir -p /app/data /books /bookdrop /app/logs && \
-    chown -R bsd:bsd /app/data /books /bookdrop /app /var/www/html
+    chown -R bsd:bsd /app/data /books /bookdrop /app
 
 # Make scripts executable
 RUN chmod +x /etc/services.d/*/run /etc/cont-init.d/* /healthz 2>/dev/null || true
