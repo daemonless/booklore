@@ -7,13 +7,37 @@
 ARG BOOKLORE_VERSION=latest
 ARG BASE_VERSION=15
 
+# --- Stage 1: Upstream Linux (Source) ---
 FROM --platform=linux/amd64 ghcr.io/booklore-app/booklore:${BOOKLORE_VERSION} AS upstream
 
+# --- Stage 2: FreeBSD Builder (Patching) ---
+FROM ghcr.io/daemonless/base:${BASE_VERSION} AS builder
+
+ARG UPSTREAM_URL="https://api.github.com/repos/booklore-app/booklore/releases/latest"
+
+COPY --from=upstream /app/app.jar /app/app.jar
+COPY root/patches /patches
+
+RUN pkg update && pkg install -y openjdk25-headless && \
+    VERSION=$(fetch -qo - "${UPSTREAM_URL}" | sed -n 's/.*"tag_name"[^"]*"\([^"]*\)".*/\1/p' | tr -d 'v') && \
+    cd /tmp && mkdir build && cd build && \
+    jar -xf /app/app.jar BOOT-INF/ && \
+    KEPUB_PKG="org/booklore/service/kobo" && \
+    fetch -qo KepubConversionService.java \
+        "https://raw.githubusercontent.com/booklore-app/booklore/v${VERSION}/booklore-api/src/main/java/${KEPUB_PKG}/KepubConversionService.java" && \
+    patch -p1 KepubConversionService.java /patches/freebsd-kepubify.patch && \
+    sed -i '' -e '/import lombok/d' -e 's/@Slf4j/@SuppressWarnings("unused")/' KepubConversionService.java && \
+    sed -i '' 's/public class KepubConversionService {/public class KepubConversionService { private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(KepubConversionService.class);/' KepubConversionService.java && \
+    CP="BOOT-INF/classes:$(find BOOT-INF/lib -name '*.jar' | tr '\n' ':')" && \
+    javac -proc:none -cp "$CP" -d BOOT-INF/classes KepubConversionService.java && \
+    jar -uf /app/app.jar -C /tmp/build \
+        BOOT-INF/classes/${KEPUB_PKG}/KepubConversionService.class
+
+# --- Stage 3: Final FreeBSD Image ---
 FROM ghcr.io/daemonless/base:${BASE_VERSION}
 
 ARG FREEBSD_ARCH=amd64
-ARG BOOKLORE_VERSION
-ARG PACKAGES="openjdk-jre kepubify"
+ARG PACKAGES="openjdk25-jre-headless kepubify"
 ARG UPSTREAM_URL="https://api.github.com/repos/booklore-app/booklore/releases/latest"
 ARG UPSTREAM_JQ=".tag_name"
 ARG HEALTHCHECK_ENDPOINT="http://localhost:6060/api/v1/healthcheck"
@@ -36,42 +60,24 @@ LABEL org.opencontainers.image.title="BookLore" \
       io.daemonless.upstream-jq="${UPSTREAM_JQ}" \
       io.daemonless.healthcheck-url="${HEALTHCHECK_ENDPOINT}"
 
-# Install Java runtime
+# Install minimal runtime
 RUN pkg update && \
     pkg install -y ${PACKAGES} && \
     pkg clean -ay && \
     rm -rf /var/cache/pkg/* /var/db/pkg/repos/*
 
-# Copy application from upstream
-COPY --from=upstream /app/app.jar /app/app.jar
+# Copy patched JAR from builder
+COPY --from=builder /app/app.jar /app/app.jar
 
 # Write version from upstream
 RUN VERSION=$(fetch -qo - "${UPSTREAM_URL}" | sed -n 's/.*"tag_name"[^"]*"\([^"]*\)".*/\1/p' | tr -d 'v') && \
     echo "$VERSION" > /app/version
 
-# Copy service definitions and configs (includes patches/)
+# Copy service definitions and configs
 COPY root/ /
 
-# Remove nginx service (it was for old versions)
-RUN rm -rf /etc/services.d/nginx /defaults
-
-# Patch KepubConversionService to support FreeBSD
-# Fetch source matching current version, apply patch, compile, update jar
-RUN pkg install -y openjdk25 && \
-    cd /tmp && mkdir build && cd build && \
-    jar -xf /app/app.jar BOOT-INF/ && \
-    KEPUB_PKG="org/booklore/service/kobo" && \
-    fetch -qo KepubConversionService.java \
-        "https://raw.githubusercontent.com/booklore-app/booklore/v$(cat /app/version)/booklore-api/src/main/java/${KEPUB_PKG}/KepubConversionService.java" && \
-    patch -p1 KepubConversionService.java /patches/freebsd-kepubify.patch && \
-    sed -i '' -e '/import lombok/d' -e 's/@Slf4j/@SuppressWarnings("unused")/' KepubConversionService.java && \
-    sed -i '' 's/public class KepubConversionService {/public class KepubConversionService { private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(KepubConversionService.class);/' KepubConversionService.java && \
-    CP="BOOT-INF/classes:$(find BOOT-INF/lib -name '*.jar' | tr '\n' ':')" && \
-    javac -proc:none -cp "$CP" -d BOOT-INF/classes KepubConversionService.java && \
-    jar -uf /app/app.jar -C /tmp/build \
-        BOOT-INF/classes/${KEPUB_PKG}/KepubConversionService.class && \
-    pkg delete -y openjdk25 && pkg autoremove -y && pkg clean -ay && \
-    rm -rf /tmp/build /var/cache/pkg/* /var/db/pkg/repos/*
+# Remove build-time artifacts and obsolete services
+RUN rm -rf /patches /etc/services.d/nginx /defaults
 
 # Create directories
 RUN mkdir -p /app/data /books /bookdrop /app/logs && \
