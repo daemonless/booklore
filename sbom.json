@@ -1,12 +1,12 @@
 {
   "image": "booklore",
-  "generated": "2026-02-26T19:45:00Z",
+  "generated": "2026-03-01T09:15:41Z",
   "tags": {
     "latest": {
       "arch": "amd64",
-      "app_version": "2.0.3",
+      "app_version": "2.0.4",
       "source": "upstream",
-      "generated": "2026-02-26T19:44:42Z",
+      "generated": "2026-03-01T09:15:25Z",
       "packages": {
         "freebsd": [
           {
@@ -364,7 +364,7 @@
           },
           {
             "name": "com.github.junrar:junrar",
-            "version": "7.5.7"
+            "version": "7.5.8"
           },
           {
             "name": "com.github.stephenc.jcip:jcip-annotations",
@@ -400,39 +400,39 @@
           },
           {
             "name": "com.twelvemonkeys.common:common-image",
-            "version": "3.13.0"
+            "version": "3.13.1"
           },
           {
             "name": "com.twelvemonkeys.common:common-io",
-            "version": "3.13.0"
+            "version": "3.13.1"
           },
           {
             "name": "com.twelvemonkeys.common:common-lang",
-            "version": "3.13.0"
+            "version": "3.13.1"
           },
           {
             "name": "com.twelvemonkeys.imageio:imageio-bmp",
-            "version": "3.13.0"
+            "version": "3.13.1"
           },
           {
             "name": "com.twelvemonkeys.imageio:imageio-core",
-            "version": "3.13.0"
+            "version": "3.13.1"
           },
           {
             "name": "com.twelvemonkeys.imageio:imageio-jpeg",
-            "version": "3.13.0"
+            "version": "3.13.1"
           },
           {
             "name": "com.twelvemonkeys.imageio:imageio-metadata",
-            "version": "3.13.0"
+            "version": "3.13.1"
           },
           {
             "name": "com.twelvemonkeys.imageio:imageio-tiff",
-            "version": "3.13.0"
+            "version": "3.13.1"
           },
           {
             "name": "com.twelvemonkeys.imageio:imageio-webp",
-            "version": "3.13.0"
+            "version": "3.13.1"
           },
           {
             "name": "com.zaxxer:HikariCP",
@@ -648,7 +648,7 @@
           },
           {
             "name": "org.flywaydb:flyway-mysql",
-            "version": "12.0.1"
+            "version": "12.0.2"
           },
           {
             "name": "org.freemarker:freemarker",
@@ -680,7 +680,7 @@
           },
           {
             "name": "org.hibernate:hibernate-core",
-            "version": "7.2.4.Final"
+            "version": "7.2.5.Final"
           },
           {
             "name": "org.jboss.logging:jboss-logging",
