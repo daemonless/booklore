@@ -1,12 +1,12 @@
 {
   "image": "booklore",
-  "generated": "2026-03-08T20:42:01Z",
+  "generated": "2026-03-11T16:58:47Z",
   "tags": {
     "latest": {
       "arch": "amd64",
-      "app_version": "2.1.0",
+      "app_version": "2.2.0",
       "source": "upstream",
-      "generated": "2026-03-08T20:41:45Z",
+      "generated": "2026-03-11T16:58:31Z",
       "packages": {
         "freebsd": [
           {
