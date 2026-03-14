@@ -1,12 +1,12 @@
 {
   "image": "booklore",
-  "generated": "2026-03-11T16:58:47Z",
+  "generated": "2026-03-14T09:43:59Z",
   "tags": {
     "latest": {
       "arch": "amd64",
-      "app_version": "2.2.0",
+      "app_version": "2.2.1",
       "source": "upstream",
-      "generated": "2026-03-11T16:58:31Z",
+      "generated": "2026-03-14T09:43:44Z",
       "packages": {
         "freebsd": [
           {
@@ -395,6 +395,10 @@
             "version": "11.26.1"
           },
           {
+            "name": "com.squareup.okio:okio-jvm",
+            "version": "3.16.4"
+          },
+          {
             "name": "com.sun.istack:istack-commons-runtime",
             "version": "4.1.2"
           },
@@ -540,7 +544,7 @@
           },
           {
             "name": "net.jthink:jaudiotagger",
-            "version": "3.0.1"
+            "version": "2.3.15"
           },
           {
             "name": "net.lingala.zip4j:zip4j",
@@ -685,6 +689,18 @@
           {
             "name": "org.jboss.logging:jboss-logging",
             "version": "3.6.2.Final"
+          },
+          {
+            "name": "org.jetbrains.kotlin:kotlin-stdlib",
+            "version": "2.2.21"
+          },
+          {
+            "name": "org.jetbrains:annotations",
+            "version": "13.0"
+          },
+          {
+            "name": "org.json:json",
+            "version": "20250517"
           },
           {
             "name": "org.jsoup:jsoup",
@@ -1002,13 +1018,13 @@
         "freebsd": 65,
         "dotnet": 0,
         "go": 11,
-        "java": 166,
+        "java": 170,
         "node": 0,
         "php": 0,
         "python": 2,
         "ruby": 0,
         "rust": 0,
-        "total": 244
+        "total": 248
       }
     }
   }
