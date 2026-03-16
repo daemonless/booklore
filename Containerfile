@@ -46,7 +46,7 @@ ENV HEALTHCHECK_URL="${HEALTHCHECK_ENDPOINT}"
 
 # --- Metadata (Injected by Generator) ---
 LABEL org.opencontainers.image.title="BookLore" \
-      org.opencontainers.image.description="Self-hosted digital library with smart shelves, metadata, OPDS support, and built-in reader." \
+      org.opencontainers.image.description="Self-hosted digital library with smart shelves, metadata, OPDS support, and built-in reader. **Deprecated** — BookLore development has stopped and the project has been deleted." \
       org.opencontainers.image.source="https://github.com/daemonless/booklore" \
       org.opencontainers.image.url="https://booklore.org/" \
       org.opencontainers.image.documentation="https://booklore-app.github.io/booklore-docs/" \
