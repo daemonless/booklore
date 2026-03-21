@@ -4,7 +4,9 @@ x-daemonless:
   title: "BookLore"
   icon: ":material-book-open-page-variant:"
   category: "Media Management"
-  description: "Self-hosted digital library with smart shelves, metadata, OPDS support, and built-in reader. **Deprecated** — BookLore development has stopped and the project has been deleted."
+  description: "Self-hosted digital library with smart shelves, metadata, OPDS support, and built-in reader."
+  deprecated:
+    reason: "Upstream development has stopped and the repository has been deleted."
   upstream_url: "https://github.com/booklore-app/booklore"
   web_url: "https://booklore.org/"
   user: "bsd"
