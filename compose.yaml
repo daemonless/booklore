@@ -7,6 +7,7 @@ x-daemonless:
   description: "Self-hosted digital library with smart shelves, metadata, OPDS support, and built-in reader."
   deprecated:
     reason: "Upstream development has stopped and the repository has been deleted."
+    successor: "https://daemonless.io/images/grimmory"
   upstream_url: "https://github.com/booklore-app/booklore"
   web_url: "https://booklore.org/"
   user: "bsd"
